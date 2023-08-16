@@ -1,8 +1,7 @@
-import sys
 import socket
-import io
+import sys
 from threading import Thread
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
 
 class Program:

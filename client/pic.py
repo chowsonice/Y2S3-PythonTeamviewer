@@ -41,8 +41,3 @@ class PicForm:
         s = "QUIT"
         Program.nw.sendall(s.encode())
         self.root.destroy()
-
-if __name__ == "__main__":
-    root = Tk()
-    pic_form = PicForm(root)
-    root.mainloop()

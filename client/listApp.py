@@ -115,10 +115,3 @@ class StartForm(tk.Toplevel):
         self.master.send_message(process_name)
         response = self.master.receive_message()
         messagebox.showinfo("Result", response)
-
-if __name__ == "__main__":
-    server_address = '127.0.0.1'  # Replace with your server address
-    server_port = 1234  # Replace with your server port
-
-    app = ListAppForm(server_address, server_port)
-    app.mainloop()
