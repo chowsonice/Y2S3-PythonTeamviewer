@@ -4,6 +4,8 @@ import socket
 import tkinter as tk
 from tkinter import messagebox
 from Program import Program
+from listApp import ListApp
+from pic import Pic
 
 class ClientApp(tk.Tk):
     def __init__(self):
@@ -55,11 +57,11 @@ class ClientApp(tk.Tk):
             Program.client.connect((server_ip, server_port))
             messagebox.showinfo("Success", "Connected to the server")
             
-            Program.ns = Program.client.makefile("rw")
+            Program.ns = Program.client.makefile("rwb")
             Program.nr = io.TextIOWrapper(Program.ns, encoding="utf-8")
             Program.nw = io.TextIOWrapper(Program.ns, encoding="utf-8")
         except Exception as ex:
-            messagebox.showinfo("Error", "Failed to connect to the server", ex)
+            messagebox.showinfo("Error", f"Failed to connect to the server: {ex}")
             Program.client = None
 
     def openApp(self):
@@ -67,12 +69,13 @@ class ClientApp(tk.Tk):
             messagebox.showinfo("Error", "Not connected to the server")
             return
         
-        s = "APPLICATION\n"
-        Program.nw.write(s.encode("utf-8"))
+        s = 'APPLICATION'
+        print(s)
+        Program.nw.write(s+'\n')
         Program.nw.flush()
-        
-        # Additional code to show the application list dialog
-             
+        list_app = ListApp()
+        list_app.mainloop()
+
     def shutdown(self):
         if Program.client is None:
             messagebox.showinfo("Error", "Not connected to the server")
@@ -110,8 +113,10 @@ class ClientApp(tk.Tk):
         s = "TAKEPIC"
         Program.nw.write(s + "\n")
         Program.nw.flush()
+
+        take_pic = Pic()
+        take_pic.mainloop()
         
-        # Additional code to capture and display the picture
         
     def keyLogger(self):
         if Program.client is None:

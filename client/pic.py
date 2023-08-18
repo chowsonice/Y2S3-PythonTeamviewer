@@ -1,27 +1,27 @@
 import sys
 import os
 import socket
+import tkinter as tk
 from io import BytesIO
 from PIL import Image
-from tkinter import *
 from tkinter import filedialog
+from Program import Program
 
-class PicForm:
-    def __init__(self, root):
-        self.root = root
-        self.initialize_components()
+class Pic(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-    def initialize_components(self):
-        self.root.title("Pic")
-        self.butTake = Button(self.root, text="Take", command=self.lam)
+        self.title("Pic")
+        self.butTake = tk.Button(self, text="Take", command=self.lam)
         self.butTake.pack()
-        self.button1 = Button(self.root, text="Save", command=self.save_image)
+        self.button1 = tk.Button(self, text="Save", command=self.save_image)
         self.button1.pack()
-        self.root.protocol("WM_DELETE_WINDOW", self.pic_closing)
+        self.protocol("WM_DELETE_WINDOW", self.pic_closing)
 
     def lam(self):
         s = "TAKE"
-        Program.nw.sendall(s.encode())
+        Program.nw.write(s + '\n')
+        Program.nw.flush()
         s = Program.nr.readline().strip()
         data = bytearray(int(s))
         rec = Program.client.recv_into(data)
@@ -39,5 +39,6 @@ class PicForm:
 
     def pic_closing(self):
         s = "QUIT"
-        Program.nw.sendall(s.encode())
-        self.root.destroy()
+        Program.nw.write(s+'\n')
+        Program.nw.flush()
+        self.destroy()

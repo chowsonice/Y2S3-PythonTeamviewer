@@ -1,51 +1,32 @@
 import tkinter as tk
-import socket
 from tkinter import messagebox
+from Program import Program
 
-class KillForm(tk.Tk):
-    def __init__(self, server_address, server_port):
+class Kill(tk.Tk):
+    def __init__(self):
         super().__init__()
-
         self.title("Kill")
-        self.geometry("300x200")
 
-        self.label_id = tk.Label(self, text="Enter Process ID:")
-        self.label_id.pack()
+        self.txtID = tk.Entry(self)
+        self.txtID.pack()
 
-        self.entry_id = tk.Entry(self)
-        self.entry_id.pack()
+        self.butNhap = tk.Button(self, text="Kill", command=self.kill_process)
+        self.butNhap.pack()
 
-        self.button_kill = tk.Button(self, text="Kill", command=self.send_kill)
-        self.button_kill.pack()
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
-        self.protocol("WM_DELETE_WINDOW", self.send_quit)
+    def kill_process(self):
+        # Program.nw.write("KILLID\n")
+        # Program.nw.flush()
+        Program.nw.write(self.txtID.get() + "\n")
+        Program.nw.flush()
+        s = Program.nr.readline().strip()
 
-        self.server_address = server_address
-        self.server_port = server_port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.server_address, self.server_port))
-
-    def send_message(self, message):
-        self.socket.sendall(message.encode())
-
-    def receive_message(self):
-        return self.socket.recv(1024).decode()
-
-    def send_kill(self):
-        process_id = self.entry_id.get()
-        self.send_message("KILLID")
-        self.send_message(process_id)
-        response = self.receive_message()
-        messagebox.showinfo("Result", response)
-
-    def send_quit(self):
-        self.send_message("QUIT")
-        self.socket.close()
+    def on_close(self):
+        Program.nw.write("QUIT\n")
+        Program.nw.flush()
         self.destroy()
 
-if __name__ == "__main__":
-    server_address = '127.0.0.1'  # Replace with your server address
-    server_port = 1234  # Replace with your server port
-
-    app = KillForm(server_address, server_port)
-    app.mainloop()
+if __name__ == '__main__':
+    kill = Kill()
+    kill.mainloop()
