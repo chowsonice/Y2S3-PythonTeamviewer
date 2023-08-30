@@ -1,52 +1,54 @@
-from tkinter import *
+import tkinter as tk
 import socket
 from Program import Program
 
-class KeylogForm:
-    def __init__(self, root):
-        self.root = root
+class KeylogForm(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
         self.initialize_components()
 
     def initialize_components(self):
-        self.root.title("Keylog")
-        self.button1 = Button(self.root, text="HOOK", command=self.hook)
-        self.button1.pack()
-        self.button2 = Button(self.root, text="UNHOOK", command=self.unhook)
-        self.button2.pack()
-        self.button3 = Button(self.root, text="PRINT", command=self.print_log)
-        self.button3.pack()
-        self.button4 = Button(self.root, text="QUIT", command=self.keylog_closing)
-        self.button4.pack()
-        self.txtKQ = Text(self.root)
-        self.txtKQ.pack()
-        self.butXoa = Button(self.root, text="Clear", command=self.clear_log)
-        self.butXoa.pack()
-        self.root.protocol("WM_DELETE_WINDOW", self.keylog_closing)
+        self.title("Keystroke")
+
+        self.txtKQ = tk.Text(self, state="disabled")
+        self.txtKQ.pack(padx=12, pady=80)
+
+        self.button1 = tk.Button(self, text="HOOK", command=self.hook)
+        self.button1.place(x=12, y=12, width=75, height=59)
+        self.button2 = tk.Button(self, text="UNHOOK", command=self.unhook)
+        self.button2.place(x=93, y=13, width=75, height=58)
+        self.button4 = tk.Button(self, text="IN PHÍM", command=self.print_log)
+        self.button4.place(x=174, y=12, width=75, height=59)
+        self.butXoa = tk.Button(self, text="Clear", command=self.clear_log)
+        self.butXoa.place(x=256, y=13, width=74, height=58)
+
+        self.protocol("WM_DELETE_WINDOW", self.keylog_closing)
 
     def hook(self):
         s = "HOOK"
-        Program.nw.WriteLine(s); Program.nw.Flush();
+        Program.nw.write(s + '\n'); Program.nw.flush();
 
     def unhook(self):
         s = "UNHOOK"
-        Program.nw.WriteLine(s); Program.nw.Flush();
+        Program.nw.write(s + '\n'); Program.nw.flush();
 
     def print_log(self):
         s = "PRINT"
-        Program.nw.WriteLine(s); Program.nw.Flush();
+        Program.nw.write(s + '\n'); Program.nw.flush();
 
-        data = Program.nr.recv(5000).decode()
-        self.txtKQ.insert(END, data)
+        data = Program.client.recv(5000).strip()
+
+        self.txtKQ.configure(state="normal")
+        self.txtKQ.insert(tk.END, data)
+        self.txtKQ.configure(state="disabled")
 
     def clear_log(self):
-        self.txtKQ.delete(1.0, END)
+        self.txtKQ.configure(state="normal")
+        self.txtKQ.delete("1.0", tk.END)
+        self.txtKQ.configure(state="disabled")
 
     def keylog_closing(self):
         s = "QUIT"
-        Program.nw.WriteLine(s); Program.nw.Flush();
-        self.root.destroy()
+        Program.nw.write(s + '\n'); Program.nw.flush();
+        self.destroy()
 
-if __name__ == "__main__":
-    root = Tk()
-    keylog_form = KeylogForm(root)
-    root.mainloop()

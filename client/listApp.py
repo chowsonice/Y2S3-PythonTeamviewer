@@ -4,25 +4,28 @@ from Program import Program
 from Start import Start
 from Kill import Kill
 
-class ListApp(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class ListApp(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
         self.title("List App")
+        self.geometry("320x277")
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.button_view = tk.Button(self, text="XEM", command=self.view_applications)
+        self.button_view.place(x=92, y=12, width=65, height=52)
 
         self.button_kill = tk.Button(self, text="KILL", command=self.kill_application)
-        self.button_kill.pack()
-
-        self.button_view = tk.Button(self, text="VIEW", command=self.view_applications)
-        self.button_view.pack()
+        self.button_kill.place(x=22, y=12, width=64, height=52)
 
         self.button_start = tk.Button(self, text="START", command=self.start_application)
-        self.button_start.pack()
-
-        self.button_clear = tk.Button(self, text="CLEAR", command=self.clear_list)
-        self.button_clear.pack()
+        self.button_start.place(x=244, y=12, width=64, height=52)
 
         self.list_view = tk.Listbox(self)
-        self.list_view.pack()
+        self.list_view.place(x=22, y=83, width=286, height=182)
+
+        self.button_clear = tk.Button(self, text="XÓA", command=self.clear_list)
+        self.button_clear.place(x=163, y=12, width=75, height=52)
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -30,8 +33,8 @@ class ListApp(tk.Tk):
         temp = "KILL"
         Program.nw.write(temp + "\n")
         Program.nw.flush()
-        view_kill = Kill()
-        view_kill.mainloop()
+        view_kill = Kill(self)
+        view_kill.grab_set()
 
     def view_applications(self):
         temp = "XEM"
@@ -40,8 +43,16 @@ class ListApp(tk.Tk):
         s1 = "Name application"
         s2 = "ID"
         s3 = "Count"
+        cmd = Program.nr.readline().strip()
+        if (cmd != "SOPROCESS"):
+            Program.nw.write("no\n")
+            Program.nw.flush()
+            return;
+        else:
+            Program.nw.write("ok\n")
+            Program.nw.flush()
         temp = Program.nr.readline().strip()
-        print(temp)
+        print("So process " + temp)
         soprocess = int(temp)
         for _ in range(soprocess):
             s1 = Program.nr.readline().strip()
@@ -55,8 +66,8 @@ class ListApp(tk.Tk):
         temp = "START"
         Program.nw.write(temp + "\n")
         Program.nw.flush()
-        view_start = Start()
-        view_start.mainloop()
+        view_start = Start(self)
+        view_start.grab_set()
 
     def on_close(self):
         s = "QUIT"
@@ -65,8 +76,4 @@ class ListApp(tk.Tk):
         self.destroy()
 
     def clear_list(self):
-        list_view.delete(0, tk.END)
-
-if __name__ == '__main__':
-    app = ListApp()
-    app.mainloop()
+        self.list_view.delete(0, tk.END)

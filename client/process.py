@@ -1,93 +1,78 @@
-import sys
 import tkinter as tk
 from tkinter import messagebox
 from Program import Program
-class Process(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Process")
-        self.create_widgets()
+from Start import Start
+from Kill import Kill
 
-    def create_widgets(self):
-        button1 = tk.Button(self, text="Kill", command=self.kill_button_click)
-        button1.pack()
+class ListProcess(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("List Process")
+        self.geometry("320x277")
 
-        button2 = tk.Button(self, text="XEM", command=self.xem_button_click)
-        button2.pack()
+        self.button_kill = tk.Button(self, text="KILL", command=self.kill_process)
+        self.button_kill.place(x=24, y=12, width=66, height=47)
 
-        button3 = tk.Button(self, text="Start", command=self.start_button_click)
-        button3.pack()
+        self.button_view = tk.Button(self, text="XEM", command=self.view_processes)
+        self.button_view.place(x=96, y=12, width=59, height=47)
 
-        button4 = tk.Button(self, text="Reset List", command=self.reset_list_button_click)
-        button4.pack()
+        self.button_start = tk.Button(self, text="START", command=self.start_process)
+        self.button_start.place(x=231, y=12, width=59, height=47)
 
-        self.listview = tk.Listbox(self)
-        self.listview.pack()
+        self.list_view = tk.Listbox(self)
+        self.list_view.place(x=24, y=74, width=266, height=162)
+        self.list_view.insert(tk.END, "Name Process\tID Process\tCount Thread")
 
-        self.protocol("WM_DELETE_WINDOW", self.window_closing)
+        self.button_clear = tk.Button(self, text="XÓA", command=self.clear_list)
+        self.button_clear.place(x=161, y=12, width=64, height=47)
 
-    def kill_button_click(self):
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def kill_process(self):
         temp = "KILL"
-        Program.nw.WriteLine(temp)
-        Program.nw.Flush()
-        messagebox.showinfo("Kill", temp)
-        viewkill = Kill()
-        viewkill.mainloop()
+        Program.nw.write(temp + "\n")
+        Program.nw.flush()
+        view_kill = Kill(self)
+        view_kill.grab_set()
 
-    def xem_button_click(self):
+    def view_processes(self):
         temp = "XEM"
-        Program.nw.WriteLine(temp)
-        Program.nw.Flush()
-        s1 = "name process"
+        Program.nw.write(temp + "\n")
+        Program.nw.flush()
+        s1 = "Name process"
         s2 = "ID"
-        s3 = "count"
-        temp = Program.nr.ReadLine()
+        s3 = "Count"
+        cmd = Program.nr.readline().strip()
+        if (cmd != "SOPROCESS"):
+            Program.nw.write("no\n")
+            Program.nw.flush()
+            return;
+        else:
+            Program.nw.write("ok\n")
+            Program.nw.flush()
+        temp = Program.nr.readline().strip()
+        print("So process " + temp)
         soprocess = int(temp)
-        # reset list?
-        for i in range(soprocess):
-            s1 = "process"
-            s2 = "ID"
-            s3 = "count"
-            self.listview.insert(tk.END, f"{s1}, {s2}, {s3}")
+        for _ in range(soprocess):
+            s1 = Program.nr.readline().strip()
+            s2 = Program.nr.readline().strip()
+            s3 = Program.nr.readline().strip()
+            one = [s1, s2, s3]
+            print(one)
+            self.list_view.insert(tk.END, one)
 
-    def start_button_click(self):
+    def start_process(self):
         temp = "START"
-        # Program.nw.WriteLine(temp);Program.nw.Flush()
-        messagebox.showinfo("Start", temp)
-        viewstart = Start()
-        viewstart.mainloop()
+        Program.nw.write(temp + "\n")
+        Program.nw.flush()
+        view_start = Start(self)
+        view_start.grab_set()
 
-    def reset_list_button_click(self):
-        self.listview.delete(0, tk.END)
-
-    def window_closing(self):
+    def on_close(self):
         s = "QUIT"
-        # Program.nw.WriteLine(s); Program.nw.Flush()
+        Program.nw.write(s + "\n")
+        Program.nw.flush()
         self.destroy()
 
-
-class Kill(tk.Toplevel):
-    def __init__(self):
-        super().__init__()
-        self.title("Kill")
-        self.create_widgets()
-
-    def create_widgets(self):
-        label = tk.Label(self, text="Kill Window")
-        label.pack()
-
-
-class Start(tk.Toplevel):
-    def __init__(self):
-        super().__init__()
-        self.title("Start")
-        self.create_widgets()
-
-    def create_widgets(self):
-        label = tk.Label(self, text="Start Window")
-        label.pack()
-
-
-if __name__ == '__main__':
-    process = Process()
-    process.mainloop()
+    def clear_list(self):
+        self.list_view.delete(0, tk.END)

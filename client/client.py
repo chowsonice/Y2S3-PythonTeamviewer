@@ -6,6 +6,10 @@ from tkinter import messagebox
 from Program import Program
 from listApp import ListApp
 from pic import Pic
+from process import ListProcess
+from keylog import KeylogForm
+from registry import RegistryForm
+
 
 class ClientApp(tk.Tk):
     def __init__(self):
@@ -14,40 +18,41 @@ class ClientApp(tk.Tk):
         Program.ns = None
         Program.nr = None
         Program.nw = None
-        
-        self.title("Client")
 
-        self.lblIP = tk.Label(self, text="Server IP:")
-        self.lblIP.pack()
-        
+        self.title("Client")
+        self.geometry("372x302")
+
+        self.butApp = tk.Button(self, text="App Running", command=self.openApp)
+        self.butApp.place(x=93, y=64, width=145, height=63)
+
+        self.butConnect = tk.Button(self, text="Kết nối", command=self.connectServer)
+        self.butConnect.place(x=244, y=27, width=100, height=23)
+
         self.txtIP = tk.Entry(self)
-        self.txtIP.pack()
-        
-        self.butApp = tk.Button(self, text="APPLICATION", command=self.openApp)
-        self.butApp.pack()
-        
-        self.butConnect = tk.Button(self, text="CONNECT", command=self.connectServer)
-        self.butConnect.pack()
-        
-        self.button1 = tk.Button(self, text="SHUTDOWN", command=self.shutdown)
-        self.button1.pack()
-        
-        self.butReg = tk.Button(self, text="REGISTRY", command=self.openRegistry)
-        self.butReg.pack()
-        
-        self.butExit = tk.Button(self, text="QUIT", command=self.exitApp)
-        self.butExit.pack()
-        
-        self.butPic = tk.Button(self, text="TAKEPIC", command=self.takePicture)
-        self.butPic.pack()
-        
-        self.butKeyLock = tk.Button(self, text="KEYLOG", command=self.keyLogger)
-        self.butKeyLock.pack()
-        
-        self.butProcess = tk.Button(self, text="PROCESS", command=self.openProcess)
-        self.butProcess.pack()
-        
+        self.txtIP.place(x=12, y=29, width=226, height=20)
+        self.txtIP.insert(tk.END, "Nhập IP")
+
+        self.butTat = tk.Button(self, text="Tắt máy", command=self.shutdown)
+        self.butTat.place(x=93, y=133, width=48, height=57)
+
+        self.butReg = tk.Button(self, text="Sửa registry", command=self.openRegistry)
+        self.butReg.place(x=93, y=196, width=198, height=65)
+
+        self.butExit = tk.Button(self, text="Thoát", command=self.exitApp)
+        self.butExit.place(x=297, y=196, width=47, height=65)
+
+        self.butPic = tk.Button(self, text="Chụp màn hình", command=self.takePicture)
+        self.butPic.place(x=147, y=133, width=91, height=57)
+
+        self.butKeyLock = tk.Button(self, text="Keystroke", command=self.keyLogger)
+        self.butKeyLock.place(x=244, y=64, width=100, height=126)
+
+        self.butProcess = tk.Button(self, text="Process \nRunning", command=self.openProcess)
+        self.butProcess.place(x=12, y=64, width=75, height=197)
+
         self.protocol("WM_DELETE_WINDOW", self.closeApp)
+        self.mainloop()
+
         
     def connectServer(self):
         try:
@@ -73,8 +78,8 @@ class ClientApp(tk.Tk):
         print(s)
         Program.nw.write(s+'\n')
         Program.nw.flush()
-        list_app = ListApp()
-        list_app.mainloop()
+        list_app = ListApp(self)
+        list_app.grab_set()
 
     def shutdown(self):
         if Program.client is None:
@@ -84,6 +89,7 @@ class ClientApp(tk.Tk):
         s = "SHUTDOWN"
         Program.nw.write(s + "\n")
         Program.nw.flush()
+
         Program.client.close()
         Program.client = None
         
@@ -96,7 +102,8 @@ class ClientApp(tk.Tk):
         Program.nw.write(s + "\n")
         Program.nw.flush()
         
-        # Additional code to show the registry dialog
+        registry = RegistryForm(self)
+        registry.grab_set()
         
     def exitApp(self):
         s = "QUIT"
@@ -114,8 +121,8 @@ class ClientApp(tk.Tk):
         Program.nw.write(s + "\n")
         Program.nw.flush()
 
-        take_pic = Pic()
-        take_pic.mainloop()
+        take_pic = Pic(self)
+        take_pic.grab_set()
         
         
     def keyLogger(self):
@@ -126,8 +133,10 @@ class ClientApp(tk.Tk):
         s = "KEYLOG"
         Program.nw.write(s + "\n")
         Program.nw.flush()
+
+        keylogger = KeylogForm(self)
+        keylogger.grab_set()
         
-        # Additional code to start the keylogger
         
     def closeApp(self):
         s = "QUIT"
@@ -144,8 +153,9 @@ class ClientApp(tk.Tk):
         s = "PROCESS"
         Program.nw.write(s + "\n")
         Program.nw.flush()
+        list_process = ListProcess(self)
+        list_process.grab_set()
         
-        # Additional code to show the process list dialog
 
 if __name__ == "__main__":
     app = ClientApp()
