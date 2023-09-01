@@ -1,0 +1,24 @@
+# client requirements
+sys
+io
+socket
+tkinter
+os
+base64
+tkinter.filedialog
+
+# server requirements
+socket
+os
+sys
+winreg
+subprocess
+io
+threading
+mss
+psutil
+base64
+tkinter
+PIL.Image
+time
+pynput.keyboard

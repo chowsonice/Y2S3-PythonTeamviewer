@@ -10,55 +10,57 @@ class RegistryForm(tk.Toplevel):
         super().__init__(parent)
         self.title("Registry")
         
-        self.txtReg = tk.Text(self, height=1, width=40)
-        self.txtReg.grid(row=0, column=0, columnspan=2)
-        self.txtReg.insert(tk.INSERT, "Nội dung")
-        
-        self.butSend = tk.Button(self, text="Gởi nội dung", command=self.send_content)
-        self.butSend.grid(row=0, column=2)
-        
-        self.butBro = tk.Button(self, text="Browser...", command=self.browse_file)
-        self.butBro.grid(row=1, column=2)
-        
         self.txtBro = tk.Entry(self, width=40)
         self.txtBro.insert(tk.END, "Đường dẫn ...")
-        self.txtBro.grid(row=1, column=0, columnspan=2)
+        self.txtBro.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        
+        self.butSend = tk.Button(self, text="Gởi nội dung", command=self.send_content)
+        self.butSend.grid(row=1, column=2, padx=5, pady=5)
+        
+        self.butBro = tk.Button(self, text="Browser...", command=self.browse_file)
+        self.butBro.grid(row=0, column=2, padx=5, pady=5)
+        
+        self.txtReg = tk.Text(self, width=40, height=10)
+        self.txtReg.insert(tk.END, "Nội dung")
+        self.txtReg.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
         
         self.groupBox1 = tk.LabelFrame(self, text="Sửa giá trị trực tiếp")
         self.groupBox1.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
-        
-        self.button1 = tk.Button(self.groupBox1, text="Gởi", command=self.send_value)
-        self.button1.grid(row=0, column=0, padx=5, pady=5)
         
         self.opApp = tk.StringVar()
         self.opApp.set("Chọn chức năng")
         
         self.opAppMenu = ttk.OptionMenu(self.groupBox1, self.opApp, "Chọn chức năng", "Get value", "Set value", "Delete value", "Create key", "Delete key", command=self.app_selection)
-        self.opAppMenu.pack()
+        self.opAppMenu.config(width=15)
+        self.opAppMenu.grid(row=0, column=0, padx=5, pady=5)
         
         self.txtKQ = tk.Text(self.groupBox1, height=5, width=40)
         self.txtKQ.config(state=tk.DISABLED)
-        self.txtKQ.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        self.txtKQ.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
         
-        self.txtLink = tk.Entry(self.groupBox1)
+        self.txtLink = tk.Entry(self.groupBox1, width=40)
         self.txtLink.insert(tk.END, "Đường dẫn")
         self.txtLink.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         
-        self.txtValue = tk.Entry(self.groupBox1)
-        self.txtValue.insert(tk.END, "Value")
-        self.txtValue.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
-        
-        self.txtNameValue = tk.Entry(self.groupBox1, width=40)
+        self.txtNameValue = tk.Entry(self.groupBox1, width=30)
         self.txtNameValue.insert(tk.END, "Name value")
-        self.txtNameValue.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
+        self.txtNameValue.grid(row=3, column=0, padx=5, pady=5)
+
+        self.button1 = tk.Button(self.groupBox1, text="Gởi", command=self.send_value)
+        self.button1.grid(row=3, column=1, columnspan=1, padx=5, pady=5)
+        
+        self.txtValue = tk.Entry(self.groupBox1, width=40)
+        self.txtValue.insert(tk.END, "Value")
+        self.txtValue.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
         
         self.opTypeValue = tk.StringVar()
         self.opTypeValue.set("Kiểu dữ liệu")
         
-        self.opTypeValueMenu = tk.OptionMenu(self.groupBox1, self.opTypeValue, "String", "Binary", "DWORD", "QWORD", "Multi-String", "Expandable String")
-        self.opTypeValueMenu.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
+        self.opTypeValueMenu = ttk.OptionMenu(self.groupBox1, self.opTypeValue, "Kiểu dữ liệu", "String", "Binary", "DWORD", "QWORD", "Multi-String", "Expandable String")
+        self.opTypeValueMenu.config(width=15)
+        self.opTypeValueMenu.grid(row=4, column=1, padx=5, pady=5)
         
-        self.butXoa = Button(self.groupBox1, text="Xóa", command=self.clear_result)
+        self.butXoa = tk.Button(self.groupBox1, text="Xóa", command=self.clear_result)
         self.butXoa.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -78,14 +80,14 @@ class RegistryForm(tk.Toplevel):
     
     def browse_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Registry Files", "*.reg")])
-        self.txtBro.delete("1.0","end")
+        self.txtBro.delete(0, tk.END)
         self.txtBro.insert(tk.END, file_path)
         
         if os.path.isfile(file_path):
-            with open(file_path, 'r') as fin:
+            with open(file_path, 'r', encoding='utf-16') as fin:
                 content = fin.read()
                 print(content)
-                self.txtReg.delete(0, tk.END)
+                self.txtReg.delete('1.0', tk.END)
                 self.txtReg.insert(tk.END, content)
         else:
             messagebox.showerror("Lỗi", "Không tìm thấy file")
